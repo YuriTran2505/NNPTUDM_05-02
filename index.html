@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Products Dashboard</title>
 
   <!-- Bootstrap 5 -->
@@ -9,26 +10,365 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
+  
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px 0;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 50px;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .search-filter-container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.6s ease-out;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 40px 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #667eea;
+      pointer-events: none;
+    }
+
+    .filter-category {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: #667eea;
+    }
+
+    .products-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 220px;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image img {
+      transform: scale(1.1);
+    }
+
+    .product-info {
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-category {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      width: fit-content;
+      text-transform: uppercase;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+      line-height: 1.4;
+      flex-grow: 1;
+    }
+
+    .product-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .product-id {
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 10px;
+    }
+
+    .product-image {
+      position: relative;
+    }
+
+    .product-description {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.7));
+      color: white;
+      padding: 20px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      border-top: 2px solid #667eea;
+    }
+
+    .product-card:hover .product-description {
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: white;
+      font-size: 1.3rem;
+    }
+
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .loading {
+      text-align: center;
+      color: white;
+      padding: 40px;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .products-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .search-filter-container {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .products-container {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container mt-4">
-  <h2 class="mb-4 text-center">📦 Products Dashboard</h2>
+<div class="container-fluid">
+  <div class="header">
+    <h1><i class="fas fa-shopping-bag"></i> Products Store</h1>
+    <p>Khám phá bộ sưu tập sản phẩm độc đáo của chúng tôi</p>
+  </div>
 
-  <table class="table table-bordered table-hover align-middle">
-    <thead class="table-dark">
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Price ($)</th>
-        <th>Category</th>
-        <th>Image</th>
-      </tr>
-    </thead>
-    <tbody id="productTableBody">
-      <!-- Data render here -->
-    </tbody>
-  </table>
+  <div class="container">
+    <div class="search-filter-container">
+      <div class="search-box">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="🔍 Tìm kiếm sản phẩm..."
+        >
+        <span class="search-icon"><i class="fas fa-search"></i></span>
+      </div>
+      <div class="filter-category">
+        <button class="filter-btn active" data-category="all">
+          <i class="fas fa-th"></i> Tất cả
+        </button>
+        <button class="filter-btn" data-category="electronics">
+          <i class="fas fa-laptop"></i> Điện tử
+        </button>
+        <button class="filter-btn" data-category="furniture">
+          <i class="fas fa-chair"></i> Nội thất
+        </button>
+        <button class="filter-btn" data-category="clothes">
+          <i class="fas fa-tshirt"></i> Quần áo
+        </button>
+        <button class="filter-btn" data-category="shoes">
+          <i class="fas fa-shoe-prints"></i> Giày dép
+        </button>
+      </div>
+    </div>
+
+    <div id="loadingContainer" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Đang tải sản phẩm...</p>
+    </div>
+
+    <div id="productsContainer" class="products-container"></div>
+
+    <div id="noResults" class="no-results" style="display: none;">
+      <i class="fas fa-inbox"></i>
+      <p>Không tìm thấy sản phẩm phù hợp</p>
+    </div>
+  </div>
 </div>
 
 <script src="app.js"></script>
