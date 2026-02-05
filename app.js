@@ -14,6 +14,16 @@ const pageNumbers = document.getElementById("pageNumbers");
 const exportCsvBtn = document.getElementById("exportCsvBtn");
 const sortTitleBtn = document.getElementById("sortTitleBtn");
 const sortPriceBtn = document.getElementById("sortPriceBtn");
+const createBtn = document.getElementById('createBtn');
+const createModalEl = document.getElementById('createModal');
+const createTitleInput = document.getElementById('createTitleInput');
+const createPriceInput = document.getElementById('createPriceInput');
+const createCategoryInput = document.getElementById('createCategoryInput');
+const createDescriptionInput = document.getElementById('createDescriptionInput');
+const createImageInput = document.getElementById('createImageInput');
+const createImagePreview = document.getElementById('createImagePreview');
+const createSaveBtn = document.getElementById('createSaveBtn');
+const createCancelBtn = document.getElementById('createCancelBtn');
 
 let allProducts = [];
 let filteredProducts = [];
@@ -388,6 +398,84 @@ if (sortPriceBtn) {
 if (exportCsvBtn) {
   exportCsvBtn.addEventListener('click', exportCurrentViewToCSV);
 }
+
+// Create modal instance
+let createModalInstance = null;
+if (createModalEl && window.bootstrap) createModalInstance = new bootstrap.Modal(createModalEl);
+
+if (createBtn) {
+  createBtn.addEventListener('click', () => {
+    // reset fields
+    createTitleInput.value = '';
+    createPriceInput.value = '';
+    createCategoryInput.value = '';
+    createDescriptionInput.value = '';
+    createImageInput.value = '';
+    createImagePreview.src = 'https://via.placeholder.com/440x440?text=Image';
+    createModalInstance && createModalInstance.show();
+  });
+}
+
+createImageInput && createImageInput.addEventListener('input', (e) => {
+  const v = e.target.value.trim();
+  if (v) createImagePreview.src = v;
+});
+
+// Create product via POST
+createSaveBtn && createSaveBtn.addEventListener('click', async () => {
+  const title = createTitleInput.value.trim();
+  const price = parseFloat(createPriceInput.value) || 0;
+  const description = createDescriptionInput.value.trim();
+  const imageUrl = createImageInput.value.trim();
+  const categoryName = createCategoryInput.value.trim();
+
+  if (!title) return alert('Vui lòng nhập tiêu đề');
+
+  // Build payload for API (escuelajs expects categoryId). We'll use fallback categoryId = 1.
+  const payload = {
+    title,
+    price,
+    description,
+    categoryId: 1,
+    images: imageUrl ? [imageUrl] : []
+  };
+
+  // Optional: try to map categoryName to an id via /categories endpoint
+  if (categoryName) {
+    try {
+      const catRes = await fetch('https://api.escuelajs.co/api/v1/categories');
+      if (catRes.ok) {
+        const cats = await catRes.json();
+        const match = cats.find(c => c.name.toLowerCase() === categoryName.toLowerCase());
+        if (match) payload.categoryId = match.id;
+      }
+    } catch (e) {
+      // ignore mapping error, fallback to default
+    }
+  }
+
+  try {
+    createSaveBtn.disabled = true;
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Create failed');
+    const data = await res.json();
+
+    // Add to local data and refresh
+    allProducts.unshift(data);
+    filterProducts();
+
+    createModalInstance && createModalInstance.hide();
+  } catch (err) {
+    console.error('Create error', err);
+    alert('Có lỗi khi tạo sản phẩm');
+  } finally {
+    createSaveBtn.disabled = false;
+  }
+});
 
 filterButtons.forEach(btn => {
   btn.addEventListener("click", () => {
